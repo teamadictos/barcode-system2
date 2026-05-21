@@ -3,14 +3,9 @@ import JsBarcode from "jsbarcode";
 import { Html5QrcodeScanner } from "html5-qrcode";
 
 // Firebase
-// IMPORTANTE:
-// Si no tienes un archivo firebase.js,
-// esta configuración integrada evitará el error:
-// "File not found: ./firebase"
+import { db } from "./firebase";
 
-import { initializeApp } from "firebase/app";
 import {
-  getFirestore,
   collection,
   addDoc,
   deleteDoc,
@@ -19,43 +14,16 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
-// =============================
-// CONFIGURACIÓN FIREBASE
-// =============================
-// Reemplaza estos datos por los tuyos
-
-const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_AUTH_DOMAIN",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_STORAGE_BUCKET",
-  messagingSenderId: "TU_MESSAGING_SENDER_ID",
-  appId: "TU_APP_ID",
-};
-
-// Inicializar Firebase
-const app = initializeApp(firebaseConfig);
-
-// Base de datos Firestore
-const db = getFirestore(app);
-
 /*
 ====================================================
  SISTEMA DE CÓDIGO DE BARRAS v1.0
 ====================================================
- Funciones:
- - Generar códigos de barra
- - Escanear con celular
- - Guardar en Firebase
- - Editar productos
- - Eliminar productos
- - Descargar códigos
-====================================================
 */
 
 export default function BarcodeBusinessSystem() {
+
   // =============================
-  // Estados principales
+  // ESTADOS
   // =============================
 
   const [products, setProducts] = useState([]);
@@ -70,14 +38,14 @@ export default function BarcodeBusinessSystem() {
   const [scannedProduct, setScannedProduct] = useState(null);
 
   // =============================
-  // Cargar productos desde Firebase
-  // Tiempo real
+  // CARGAR PRODUCTOS FIREBASE
   // =============================
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
       collection(db, "products"),
       (snapshot) => {
+
         const productsData = snapshot.docs.map((docItem) => ({
           firebaseId: docItem.id,
           ...docItem.data(),
@@ -91,10 +59,11 @@ export default function BarcodeBusinessSystem() {
   }, []);
 
   // =============================
-  // Generar nuevo código de barras
+  // GENERAR CÓDIGO
   // =============================
 
   const generateBarcode = async () => {
+
     const trimmedName = String(productName || "").trim();
 
     if (!trimmedName) {
@@ -102,11 +71,12 @@ export default function BarcodeBusinessSystem() {
       return;
     }
 
-    // Genera un código único
-    const barcode = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
+    // Código único
+    const barcode =
+      `${Date.now()}${Math.floor(Math.random() * 1000)}`;
 
     try {
-      // Guardar en Firebase
+
       await addDoc(collection(db, "products"), {
         id: barcode,
         name: trimmedName,
@@ -115,29 +85,36 @@ export default function BarcodeBusinessSystem() {
       });
 
       setProductName("");
+
     } catch (error) {
+
       console.error(error);
       alert("Error guardando producto");
     }
   };
 
   // =============================
-  // Eliminar producto
+  // ELIMINAR PRODUCTO
   // =============================
 
   const deleteProduct = async (firebaseId) => {
+
     try {
+
       await deleteDoc(doc(db, "products", firebaseId));
+
     } catch (error) {
+
       console.error(error);
     }
   };
 
   // =============================
-  // Guardar nuevo nombre
+  // EDITAR PRODUCTO
   // =============================
 
   const saveNewName = async () => {
+
     const trimmedName = newName.trim();
 
     if (!editingProduct || !trimmedName) {
@@ -145,96 +122,116 @@ export default function BarcodeBusinessSystem() {
     }
 
     try {
-      await updateDoc(doc(db, "products", editingProduct.firebaseId), {
-        name: trimmedName,
-      });
+
+      await updateDoc(
+        doc(db, "products", editingProduct.firebaseId),
+        {
+          name: trimmedName,
+        }
+      );
 
       setEditingProduct(null);
       setNewName("");
+
     } catch (error) {
+
       console.error(error);
     }
   };
 
   // =============================
-  // Cantidad total de productos
+  // TOTAL PRODUCTOS
   // =============================
 
-  const productCount = useMemo(() => products.length, [products]);
+  const productCount = useMemo(
+    () => products.length,
+    [products]
+  );
 
   // =============================
-  // Render principal
+  // RENDER
   // =============================
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-gray-900 to-black p-6 text-white">
+    <div className="min-h-screen bg-gray-100 p-6">
+
       <div className="max-w-7xl mx-auto">
-        {/* ============================= */}
+
         {/* HEADER */}
-        {/* ============================= */}
 
         <div className="mb-8">
-          <h1 className="text-5xl font-black mb-3 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent tracking-tight">
+
+          <h1 className="text-4xl font-bold mb-2">
             Sistema de Código de Barras v 1.0
           </h1>
 
-          <p className="text-gray-300 text-lg">
+          <p className="text-gray-600">
             Genera, escanea y administra productos fácilmente.
           </p>
 
-          <p className="mt-3 inline-flex items-center gap-2 bg-white/10 border border-white/10 px-4 py-2 rounded-2xl text-sm text-gray-300 backdrop-blur-md">
+          <p className="mt-2 text-sm text-gray-500">
             Productos registrados: {productCount}
           </p>
+
         </div>
 
-        {/* ============================= */}
         {/* FORMULARIO */}
-        {/* ============================= */}
 
-        <div className="bg-white/10 backdrop-blur-xl rounded-[32px] shadow-2xl p-8 mb-8 border border-white/10">
-          <h2 className="text-3xl font-bold mb-6 text-white">
+        <div className="bg-white rounded-3xl shadow-lg p-6 mb-8 border border-gray-100">
+
+          <h2 className="text-2xl font-semibold mb-4">
             Agregar Producto
           </h2>
 
           <div className="flex flex-col md:flex-row gap-3">
+
             <input
               type="text"
               placeholder="Nombre del producto"
               value={productName}
-              onChange={(e) => setProductName(e.target.value)}
+              onChange={(e) =>
+                setProductName(e.target.value)
+              }
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   generateBarcode();
                 }
               }}
-              className="flex-1 h-14 rounded-2xl border border-white/10 bg-white/10 text-white placeholder-gray-400 px-5 outline-none focus:ring-2 focus:ring-cyan-400 backdrop-blur-md"
+              className="flex-1 h-12 rounded-2xl border border-gray-300 px-4 outline-none focus:ring-2 focus:ring-black"
             />
 
             <button
               onClick={generateBarcode}
-              className="h-14 px-8 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold shadow-lg shadow-cyan-500/30 transition-all duration-300 hover:scale-105"
+              className="h-12 px-6 rounded-2xl bg-black text-white font-medium hover:opacity-90 transition"
             >
               Generar Código
             </button>
 
             <button
               onClick={() => setScannerOpen(true)}
-              className="h-14 px-8 rounded-2xl bg-white/10 border border-white/10 text-white font-semibold hover:bg-white/20 transition-all duration-300 hover:scale-105 backdrop-blur-md"
+              className="h-12 px-6 rounded-2xl bg-gray-200 font-medium hover:bg-gray-300 transition"
             >
               Escanear
             </button>
+
           </div>
 
-          {/* Resultado del escaneo */}
+          {/* RESULTADO ESCANEO */}
 
           {scanResult && (
+
             <div className="mt-4 space-y-3">
+
               <div className="p-4 rounded-2xl bg-green-100 text-green-800 break-all">
+
                 <strong>Código Escaneado:</strong> {scanResult}
+
               </div>
 
               {scannedProduct ? (
+
                 <div className="p-4 rounded-2xl bg-white border border-green-200 shadow-sm">
+
                   <h3 className="text-lg font-semibold text-green-700 mb-2">
                     Producto Encontrado
                   </h3>
@@ -246,27 +243,41 @@ export default function BarcodeBusinessSystem() {
                   <p className="mt-1 break-all">
                     <strong>Código:</strong> {scannedProduct.barcode}
                   </p>
+
                 </div>
+
               ) : (
+
                 <div className="p-4 rounded-2xl bg-yellow-100 text-yellow-800 border border-yellow-200">
+
                   No se encontró un producto registrado con este código.
+
                 </div>
+
               )}
+
             </div>
+
           )}
+
         </div>
 
-        {/* ============================= */}
-        {/* LISTA DE PRODUCTOS */}
-        {/* ============================= */}
+        {/* PRODUCTOS */}
 
         {products.length === 0 ? (
+
           <div className="bg-white rounded-3xl shadow-lg p-10 text-center text-gray-500">
+
             No hay productos registrados todavía.
+
           </div>
+
         ) : (
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
+
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+
             {products.map((product) => (
+
               <ProductCard
                 key={product.firebaseId}
                 product={product}
@@ -276,63 +287,83 @@ export default function BarcodeBusinessSystem() {
                   setNewName(product.name);
                 }}
               />
+
             ))}
+
           </div>
+
         )}
 
-        {/* ============================= */}
         {/* MODAL ESCANER */}
-        {/* ============================= */}
 
         {scannerOpen && (
+
           <Modal onClose={() => setScannerOpen(false)}>
-            <h2 className="text-3xl font-bold mb-6 text-white">
+
+            <h2 className="text-2xl font-semibold mb-4">
               Escanear Código
             </h2>
 
             <BarcodeScanner
               onScan={(decodedText) => {
-                const normalizedCode = String(decodedText)
-                  .replace(/\s+/g, "")
-                  .trim();
 
-                setScanResult(normalizedCode);
-
-                const foundProduct = products.find((product) => {
-                  const savedCode = String(product.barcode)
+                const normalizedCode =
+                  String(decodedText)
                     .replace(/\s+/g, "")
                     .trim();
 
-                  return savedCode === normalizedCode;
-                });
+                setScanResult(normalizedCode);
+
+                const foundProduct =
+                  products.find((product) => {
+
+                    const savedCode =
+                      String(product.barcode)
+                        .replace(/\s+/g, "")
+                        .trim();
+
+                    return savedCode === normalizedCode;
+                  });
 
                 setScannedProduct(foundProduct || null);
 
                 if (foundProduct) {
-                  alert("Producto encontrado: " + foundProduct.name);
+                  alert(
+                    "Producto encontrado: " +
+                    foundProduct.name
+                  );
                 }
 
                 setScannerOpen(false);
               }}
             />
+
           </Modal>
+
         )}
 
-        {/* ============================= */}
         {/* MODAL EDITAR */}
-        {/* ============================= */}
 
         {editingProduct && (
-          <Modal onClose={() => setEditingProduct(null)}>
-            <h2 className="text-3xl font-bold mb-6 text-white">
+
+          <Modal
+            onClose={() =>
+              setEditingProduct(null)
+            }
+          >
+
+            <h2 className="text-2xl font-semibold mb-4">
               Cambiar Nombre
             </h2>
 
             <div className="space-y-4">
+
               <input
                 type="text"
                 value={newName}
-                onChange={(e) => setNewName(e.target.value)}
+                onChange={(e) =>
+                  setNewName(e.target.value)
+                }
                 className="w-full h-12 rounded-2xl border border-gray-300 px-4"
               />
 
@@ -342,28 +373,37 @@ export default function BarcodeBusinessSystem() {
               >
                 Guardar Cambios
               </button>
+
             </div>
+
           </Modal>
+
         )}
+
       </div>
+
     </div>
   );
 }
 
 /*
 ====================================================
- TARJETA DEL PRODUCTO
+ TARJETA PRODUCTO
 ====================================================
 */
 
-function ProductCard({ product, onDelete, onEdit }) {
+function ProductCard({
+  product,
+  onDelete,
+  onEdit,
+}) {
+
   const svgRef = useRef(null);
 
-  // =============================
-  // Generar visual del código
-  // =============================
+  // GENERAR VISUAL CÓDIGO
 
   useEffect(() => {
+
     if (!svgRef.current) return;
 
     JsBarcode(svgRef.current, product.barcode, {
@@ -375,13 +415,13 @@ function ProductCard({ product, onDelete, onEdit }) {
       margin: 15,
       lineColor: "#000000",
     });
+
   }, [product.barcode]);
 
-  // =============================
-  // Descargar código SVG
-  // =============================
+  // DESCARGAR SVG
 
   const downloadBarcode = () => {
+
     const svg = svgRef.current;
 
     if (!svg || typeof window === "undefined") {
@@ -389,40 +429,53 @@ function ProductCard({ product, onDelete, onEdit }) {
     }
 
     try {
+
       const serializer = new XMLSerializer();
-      const source = serializer.serializeToString(svg);
+
+      const source =
+        serializer.serializeToString(svg);
 
       const blob = new Blob([source], {
         type: "image/svg+xml;charset=utf-8",
       });
 
-      const url = window.URL.createObjectURL(blob);
+      const url =
+        window.URL.createObjectURL(blob);
 
-      const link = document.createElement("a");
+      const link =
+        document.createElement("a");
+
       link.href = url;
-      link.download = `${product.name}.svg`;
+
+      link.download =
+        `${product.name}.svg`;
 
       document.body.appendChild(link);
+
       link.click();
+
       document.body.removeChild(link);
 
       window.URL.revokeObjectURL(url);
+
     } catch (error) {
-      console.error("Error downloading barcode:", error);
+
+      console.error(error);
     }
   };
 
-  // =============================
-  // Diseño moderno de tarjeta
-  // =============================
-
   return (
-    <div className="bg-white/10 backdrop-blur-xl rounded-[32px] shadow-2xl border border-white/10 overflow-hidden hover:scale-[1.02] hover:shadow-cyan-500/20 transition-all duration-300">
-      {/* Header */}
 
-      <div className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white p-5">
+    <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300">
+
+      {/* HEADER */}
+
+      <div className="bg-gradient-to-r from-black to-gray-800 text-white p-4">
+
         <div className="flex justify-between items-start gap-3">
+
           <div className="min-w-0">
+
             <h3 className="text-xl font-bold break-words">
               {product.name}
             </h3>
@@ -430,52 +483,68 @@ function ProductCard({ product, onDelete, onEdit }) {
             <p className="text-sm text-gray-300 mt-1 break-all">
               Código: {product.barcode}
             </p>
+
           </div>
 
-          {/* Botones */}
+          {/* BOTONES */}
 
           <div className="flex gap-2 shrink-0">
+
             <button
               onClick={onEdit}
-              className="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-sm font-semibold backdrop-blur-md transition"
+              className="px-3 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-sm"
             >
               Editar
             </button>
 
             <button
-              onClick={() => onDelete(product.firebaseId)}
-              className="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition"
+              onClick={() =>
+                onDelete(product.firebaseId)
+              }
+              className="px-3 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm"
             >
               Eliminar
             </button>
+
           </div>
+
         </div>
+
       </div>
 
-      {/* Código de barras */}
+      {/* CÓDIGO */}
 
       <div className="p-6">
-        <div className="bg-white rounded-3xl p-6 flex justify-center overflow-x-auto shadow-inner">
+
+        <div className="bg-white border-2 border-dashed border-gray-200 rounded-2xl p-6 flex justify-center overflow-x-auto">
+
           <svg ref={svgRef}></svg>
+
         </div>
 
-        {/* Acciones */}
+        {/* DESCARGA */}
 
         <div className="mt-5 flex flex-col gap-3">
+
           <button
             onClick={downloadBarcode}
-            className="w-full h-14 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold hover:opacity-90 transition-all duration-300 shadow-lg"
+            className="w-full h-12 rounded-2xl bg-black text-white font-semibold hover:opacity-90 transition"
           >
             Descargar Código
           </button>
 
-          <div className="bg-white/10 border border-white/10 rounded-2xl p-4 text-center backdrop-blur-md">
-            <p className="text-xs text-gray-300">
+          <div className="bg-gray-50 rounded-2xl p-3 text-center">
+
+            <p className="text-xs text-gray-500">
               Escanea este código desde cualquier dispositivo
             </p>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
   );
 }
@@ -487,17 +556,20 @@ function ProductCard({ product, onDelete, onEdit }) {
 */
 
 function BarcodeScanner({ onScan }) {
+
   useEffect(() => {
+
     let scannerInstance;
 
-    scannerInstance = new Html5QrcodeScanner(
-      "scanner",
-      {
-        fps: 10,
-        qrbox: 250,
-      },
-      false
-    );
+    scannerInstance =
+      new Html5QrcodeScanner(
+        "scanner",
+        {
+          fps: 10,
+          qrbox: 250,
+        },
+        false
+      );
 
     scannerInstance.render(
       (decodedText) => {
@@ -507,19 +579,32 @@ function BarcodeScanner({ onScan }) {
     );
 
     return () => {
+
       if (scannerInstance) {
-        scannerInstance.clear().catch(() => {});
+
+        scannerInstance
+          .clear()
+          .catch(() => {});
       }
     };
+
   }, [onScan]);
 
   return (
+
     <div className="space-y-4">
+
       <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-2xl p-4 text-sm">
+
         Permite acceso a la cámara y apunta al código de barras.
+
       </div>
 
-      <div id="scanner" className="w-full min-h-[250px]" />
+      <div
+        id="scanner"
+        className="w-full min-h-[250px]"
+      />
+
     </div>
   );
 }
@@ -531,9 +616,13 @@ function BarcodeScanner({ onScan }) {
 */
 
 function Modal({ children, onClose }) {
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-slate-900 border border-white/10 text-white rounded-[32px] p-8 w-full max-w-md relative shadow-2xl">
+
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+
+      <div className="bg-white rounded-3xl p-6 w-full max-w-md relative shadow-2xl">
+
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-2xl"
@@ -542,7 +631,9 @@ function Modal({ children, onClose }) {
         </button>
 
         {children}
+
       </div>
+
     </div>
   );
 }

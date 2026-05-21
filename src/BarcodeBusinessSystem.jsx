@@ -346,63 +346,45 @@ export default function BarcodeBusinessSystem() {
 
         {editingProduct && (
 
-        <Modal
-          onClose={() =>
-            setEditingProduct(null)
-          }
-        >
+          <Modal
+            onClose={() =>
+              setEditingProduct(null)
+            }
+          >
 
-          <h2 className="text-3xl font-bold mb-5">
-            Editar Producto
-          </h2>
+            <h2 className="text-2xl font-semibold mb-4">
+              Cambiar Nombre
+            </h2>
 
-          <div className="space-y-4">
+            <div className="space-y-4">
 
-            <input
-              type="text"
-              value={newName}
-              onChange={(e) =>
-                setNewName(e.target.value)
-              }
-              className="
-                w-full
-                h-14
-                rounded-2xl
-                border
-                border-gray-200
-                bg-gray-50
-                px-5
-                outline-none
-                focus:ring-4
-                focus:ring-blue-100
-              "
-            />
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) =>
+                  setNewName(e.target.value)
+                }
+                className="w-full h-12 rounded-2xl border border-gray-300 px-4"
+              />
 
-            <button
-              onClick={saveNewName}
-              className="
-                w-full
-                h-14
-                rounded-2xl
-                bg-blue-600
-                hover:bg-blue-700
-                text-white
-                font-semibold
-              "
-            >
-              Guardar Cambios
-            </button>
+              <button
+                onClick={saveNewName}
+                className="w-full h-12 rounded-2xl bg-black text-white"
+              >
+                Guardar Cambios
+              </button>
 
-          </div>
+            </div>
 
-        </Modal>
+          </Modal>
 
-      )}
+        )}
+
+      </div>
 
     </div>
-
-  </div>
-);
+  );
+}
 
 /*
 ====================================================
@@ -542,23 +524,14 @@ function ProductCard({
 
         {/* DESCARGA */}
 
-      <div className="mt-6 space-y-3">
+        <div className="mt-5 flex flex-col gap-3">
 
-             <button
-          onClick={downloadBarcode}
-          className="
-            w-full
-            h-14
-            rounded-2xl
-            bg-gray-900
-            hover:bg-black
-            text-white
-            font-semibold
-            transition
-          "
-        >
-          Descargar Código
-        </button>
+          <button
+            onClick={downloadBarcode}
+            className="w-full h-12 rounded-2xl bg-black text-white font-semibold hover:opacity-90 transition"
+          >
+            Descargar Código
+          </button>
 
           <div className="bg-gray-50 rounded-2xl p-3 text-center">
 

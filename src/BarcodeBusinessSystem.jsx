@@ -524,14 +524,23 @@ function ProductCard({
 
         {/* DESCARGA */}
 
-        <div className="mt-5 flex flex-col gap-3">
+      <div className="mt-6 space-y-3">
 
-          <button
-            onClick={downloadBarcode}
-            className="w-full h-12 rounded-2xl bg-black text-white font-semibold hover:opacity-90 transition"
-          >
-            Descargar Código
-          </button>
+             <button
+          onClick={downloadBarcode}
+          className="
+            w-full
+            h-14
+            rounded-2xl
+            bg-gray-900
+            hover:bg-black
+            text-white
+            font-semibold
+            transition
+          "
+        >
+          Descargar Código
+        </button>
 
           <div className="bg-gray-50 rounded-2xl p-3 text-center">
 

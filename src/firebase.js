@@ -2,12 +2,13 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_AUTH_DOMAIN",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_STORAGE_BUCKET",
-  messagingSenderId: "TU_MESSAGING_SENDER_ID",
-  appId: "TU_APP_ID",
+  apiKey: "AIzaSyArjuQwsjrUeyGmDepqN7PJak3oPOSjrrE",
+  authDomain: "barcode-system-e32a8.firebaseapp.com",
+  projectId: "barcode-system-e32a8",
+  storageBucket: "barcode-system-e32a8.firebasestorage.app",
+  messagingSenderId: "26514853207",
+  appId: "1:26514853207:web:5be1d9fa07d7cf56220212",
+  measurementId: "G-2TEY89RXM5"
 };
 
 const app = initializeApp(firebaseConfig);

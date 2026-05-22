@@ -460,7 +460,6 @@ export default function BarcodeBusinessSystem() {
               )}
             </div>
           )}
-        </div>
 
         {/* ============================= */}
         {/* LISTA DE PRODUCTOS */}
@@ -468,11 +467,11 @@ export default function BarcodeBusinessSystem() {
 
         {products.length === 0 ? (
           <div
-            className={`backdrop-blur-xl rounded-[32px] shadow-xl overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 ${
+            className={
               darkMode
-                ? "bg-white/5 border border-white/10 text-white"
-                : "bg-white/90 border border-white/50 text-black"
-            }`}
+                ? "backdrop-blur-xl rounded-[32px] shadow-xl overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 bg-white/5 border border-white/10 text-white"
+                : "backdrop-blur-xl rounded-[32px] shadow-xl overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 bg-white/90 border border-white/50 text-black"
+            }
           >
             No hay productos registrados todavía.
           </div>

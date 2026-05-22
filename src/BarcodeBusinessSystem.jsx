@@ -228,11 +228,11 @@ const exportToExcel = () => {
           Productos Registrados
         </p>
 
-        <div className="mt-5">
+      <div className="mt-5">
   <button
     onClick={exportToExcel}
     className="
-      h-14
+      h-10
       px-8
       rounded-2xl
       bg-gradient-to-r

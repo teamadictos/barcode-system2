@@ -792,4 +792,3 @@ function Modal({ children, onClose }) {
       </div>
     </div>
   );
-}

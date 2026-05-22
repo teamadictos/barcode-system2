@@ -228,7 +228,13 @@ const exportToExcel = () => {
           Productos Registrados
         </p>
 
-      <div className="mt-5">
+
+        <h2 className="text-3xl font-bold">
+          {productCount}
+        </h2>
+
+      </div>
+       <div className="mt-5">
   <button
     onClick={exportToExcel}
     className="
@@ -251,12 +257,6 @@ const exportToExcel = () => {
     Exportar Excel
   </button>
 </div>
-
-        <h2 className="text-3xl font-bold">
-          {productCount}
-        </h2>
-
-      </div>
 
     </div>
 

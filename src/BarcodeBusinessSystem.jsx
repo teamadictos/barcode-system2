@@ -673,6 +673,7 @@ function Modal({ children, onClose }) {
         >
           ×
         </button>
+
         {children}
       </div>
     </div>

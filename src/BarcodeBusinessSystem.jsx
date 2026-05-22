@@ -190,6 +190,11 @@ const exportToExcel = () => {
       console.error(error);
     }
   };
+  // =============================
+// BUSCADOR
+// =============================
+
+const [searchTerm, setSearchTerm] = useState("");
 
   // =============================
   // TOTAL PRODUCTOS
@@ -201,10 +206,8 @@ const exportToExcel = () => {
   );
 
   // =============================
-// BUSCADOR EN TIEMPO REAL
+// FILTRAR PRODUCTOS
 // =============================
-
-const [searchTerm, setSearchTerm] = useState("");
 
 const filteredProducts = useMemo(() => {
 
@@ -269,7 +272,9 @@ const filteredProducts = useMemo(() => {
           {productCount}
         </h2>
 
-        {/* BUSCADOR */}
+ {/* ============================= */}
+{/* BUSCADOR EN TIEMPO REAL */}
+{/* ============================= */}
 
 <div className="mt-6">
 
@@ -282,7 +287,7 @@ const filteredProducts = useMemo(() => {
     }
     className="
       w-full
-      md:w-[420px]
+      md:w-[450px]
       h-14
       rounded-2xl
       bg-white/10

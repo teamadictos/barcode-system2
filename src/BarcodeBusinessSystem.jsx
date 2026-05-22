@@ -183,6 +183,30 @@ export default function BarcodeBusinessSystem() {
           Productos Registrados
         </p>
 
+        <div className="mt-5">
+  <button
+    onClick={exportToExcel}
+    className="
+      h-14
+      px-8
+      rounded-2xl
+      bg-gradient-to-r
+      from-green-400
+      to-emerald-500
+      text-black
+      font-bold
+      shadow-lg
+      shadow-green-500/30
+      hover:scale-105
+      hover:opacity-90
+      transition-all
+      duration-300
+    "
+  >
+    Exportar Excel
+  </button>
+</div>
+
         <h2 className="text-3xl font-bold">
           {productCount}
         </h2>

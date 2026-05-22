@@ -159,21 +159,41 @@ export default function BarcodeBusinessSystem() {
 
         {/* HEADER */}
 
-        <div className="mb-8">
+       <div className="mb-10">
 
-          <h1 className="text-4xl font-bold mb-2">
-            Sistema de Código de Barras v 1.0
-          </h1>
+  <div className="bg-white/70 backdrop-blur-xl border border-white/40 shadow-xl rounded-[30px] p-8">
 
-          <p className="text-gray-600">
-            Genera, escanea y administra productos fácilmente.
-          </p>
+    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 
-          <p className="mt-2 text-sm text-gray-500">
-            Productos registrados: {productCount}
-          </p>
+      <div>
 
-        </div>
+        <h1 className="text-5xl font-black bg-gradient-to-r from-indigo-700 to-blue-500 bg-clip-text text-transparent mb-3">
+          Barcode System
+        </h1>
+
+        <p className="text-slate-600 text-lg">
+          Genera, escanea y administra productos fácilmente.
+        </p>
+
+      </div>
+
+      <div className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white px-6 py-4 rounded-3xl shadow-lg">
+
+        <p className="text-sm opacity-80">
+          Productos Registrados
+        </p>
+
+        <h2 className="text-3xl font-bold">
+          {productCount}
+        </h2>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
 
         {/* FORMULARIO */}
 

@@ -37,6 +37,7 @@ export default function BarcodeBusinessSystem() {
 
   const [products, setProducts] = useState([]);
   const [productName, setProductName] = useState("");
+  const [category, setCategory] = useState("General");
 
   // Buscador en tiempo real
   const [searchTerm, setSearchTerm] = useState("");
@@ -127,12 +128,14 @@ export default function BarcodeBusinessSystem() {
       // Guardar en Firebase
       await addDoc(collection(db, "products"), {
         id: barcode,
+        category,
         name: trimmedName,
         barcode,
         createdAt: Date.now(),
       });
 
       setProductName("");
+      setCategory("General");
     } catch (error) {
       console.error(error);
       alert("Error guardando producto");
@@ -189,7 +192,7 @@ export default function BarcodeBusinessSystem() {
 
     // Buscar por nombre o código
     filtered = filtered.filter((product) => {
-      const text = `${product.name} ${product.barcode}`.toLowerCase();
+      const text = `${product.name} ${product.barcode} ${product.category || ""}`.toLowerCase();
       return text.includes(searchTerm.toLowerCase());
     });
 
@@ -277,6 +280,18 @@ export default function BarcodeBusinessSystem() {
           </h2>
 
           <div className="flex flex-col md:flex-row gap-3">
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="h-14 rounded-2xl border border-white/10 bg-white/10 text-white px-5 outline-none focus:ring-2 focus:ring-cyan-400 backdrop-blur-md"
+            >
+              <option value="General" className="text-black">General</option>
+              <option value="Electrónica" className="text-black">Electrónica</option>
+              <option value="Ropa" className="text-black">Ropa</option>
+              <option value="Comida" className="text-black">Comida</option>
+              <option value="Bebidas" className="text-black">Bebidas</option>
+              <option value="Tecnología" className="text-black">Tecnología</option>
+            </select>
             <input
               type="text"
               placeholder="Nombre del producto"
@@ -506,6 +521,12 @@ function ProductCard({ product, onDelete, onEdit }) {
             <h3 className="text-xl font-bold break-words">
               {product.name}
             </h3>
+
+            <div className="flex items-center gap-2 mt-2 mb-2">
+              <span className="px-3 py-1 rounded-full bg-white/20 text-xs font-semibold">
+                {product.category || "General"}
+              </span>
+            </div>
 
             <p className="text-sm text-gray-300 mt-1 break-all">
               Código: {product.barcode}

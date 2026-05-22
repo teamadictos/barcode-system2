@@ -48,10 +48,12 @@ export default function BarcodeBusinessSystem() {
       collection(db, "products"),
       (snapshot) => {
 
-        const productsData = snapshot.docs.map((docItem) => ({
-          firebaseId: docItem.id,
-          ...docItem.data(),
-        }));
+        const productsData = snapshot.docs
+  .map((docItem) => ({
+    firebaseId: docItem.id,
+    ...docItem.data(),
+  }))
+  .sort((a, b) => b.createdAt - a.createdAt);
 
         setProducts(productsData);
       }

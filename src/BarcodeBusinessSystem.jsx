@@ -566,7 +566,7 @@ export default function BarcodeBusinessSystem() {
           </Modal>
         )}
       </div>
-    </div>
+   
   );
 }
 

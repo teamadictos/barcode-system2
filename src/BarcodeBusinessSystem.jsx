@@ -43,6 +43,7 @@ const [searchTerm, setSearchTerm] = useState("");
 
   const [scanResult, setScanResult] = useState("");
   const [scannedProduct, setScannedProduct] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // =============================
   // CARGAR PRODUCTOS FIREBASE

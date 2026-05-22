@@ -184,6 +184,24 @@ export default function BarcodeBusinessSystem() {
   const productCount = useMemo(() => products.length, [products]);
 
   // =============================
+  // DASHBOARD STATS
+  // =============================
+
+  const totalCategories = useMemo(() => {
+    const categories = new Set(
+      products.map((p) => p.category || "General")
+    );
+
+    return categories.size;
+  }, [products]);
+
+  const latestProduct = useMemo(() => {
+    if (products.length === 0) return "Sin productos";
+
+    return products[0]?.name || "Sin productos";
+  }, [products]);
+
+  // =============================
   // FILTRAR PRODUCTOS
   // =============================
 
@@ -233,6 +251,38 @@ export default function BarcodeBusinessSystem() {
           </p>
 
           {/* Buscador y filtros */}
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-8 mb-8">
+            <div className="bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur-xl shadow-lg">
+              <p className="text-sm text-gray-400 mb-2">
+                Total Productos
+              </p>
+
+              <h2 className="text-4xl font-black text-cyan-400">
+                {productCount}
+              </h2>
+            </div>
+
+            <div className="bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur-xl shadow-lg">
+              <p className="text-sm text-gray-400 mb-2">
+                Categorías
+              </p>
+
+              <h2 className="text-4xl font-black text-purple-400">
+                {totalCategories}
+              </h2>
+            </div>
+
+            <div className="bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur-xl shadow-lg overflow-hidden">
+              <p className="text-sm text-gray-400 mb-2">
+                Último Producto
+              </p>
+
+              <h2 className="text-2xl font-bold text-emerald-400 truncate">
+                {latestProduct}
+              </h2>
+            </div>
+          </div>
 
           <div className="mt-6 flex flex-col md:flex-row gap-4">
             <input

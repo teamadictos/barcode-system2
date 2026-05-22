@@ -34,7 +34,6 @@ export default function BarcodeBusinessSystem() {
 // BUSCADOR
 // =============================
 
-const [searchTerm, setSearchTerm] = useState("");
 
   const [editingProduct, setEditingProduct] = useState(null);
   const [newName, setNewName] = useState("");

@@ -486,7 +486,7 @@ function ProductCard({
 
   return (
 
-    <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300">
+<div className="bg-white/90 backdrop-blur-xl rounded-[32px] shadow-xl border border-white/50 overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
 
       {/* HEADER */}
 

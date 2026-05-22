@@ -231,7 +231,6 @@ export default function BarcodeBusinessSystem() {
   // Render principal
   // =============================
 
-  return (
   <div
     className={`min-h-screen p-6 transition-all duration-500 ${
       darkMode

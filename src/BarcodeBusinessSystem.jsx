@@ -42,7 +42,6 @@ export default function BarcodeBusinessSystem() {
 
   const [scanResult, setScanResult] = useState("");
   const [scannedProduct, setScannedProduct] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("recent");
 
   // =============================
@@ -207,17 +206,14 @@ const filteredProducts = useMemo(() => {
 
   let filtered = [...products];
 
-  // BUSCADOR
-
   filtered = filtered.filter((product) => {
 
     const text =
       `${product.name} ${product.barcode}`.toLowerCase();
 
     return text.includes(searchTerm.toLowerCase());
-  });
 
-  // FILTROS
+  });
 
   if (filterType === "recent") {
 
@@ -236,11 +232,13 @@ const filteredProducts = useMemo(() => {
     filtered.sort((a, b) =>
       a.name.localeCompare(b.name)
     );
+
   }
 
   return filtered;
 
 }, [products, searchTerm, filterType]);
+
   // =============================
 // FILTRAR PRODUCTOS  termina aqui
 // =============================

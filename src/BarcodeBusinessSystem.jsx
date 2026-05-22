@@ -238,327 +238,243 @@ export default function BarcodeBusinessSystem() {
           ? "bg-gradient-to-br from-slate-950 via-slate-900 to-black text-white"
           : "bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 text-black"
       }`}
-  >
-        {/* ============================= */}
-        {/* HEADER */}
-        {/* ============================= */}
+    >
+      {/* ============================= */}
+      {/* HEADER */}
+      {/* ============================= */}
 
-        <div className="mb-8">
-          <h1 className="text-5xl font-black mb-3 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent tracking-tight">
-            Sistema de Código de Barras v 1.0
-          </h1>
-
-          <p className="text-gray-300 text-lg">
-            Genera, escanea y administra productos fácilmente.
-          </p>
-
-          <p className="mt-3 inline-flex items-center gap-2 bg-white/10 border border-white/10 px-4 py-2 rounded-2xl text-sm text-gray-300 backdrop-blur-md">
-            Productos registrados: {productCount}
-          </p>
-
-          {/* Buscador y filtros */}
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-8 mb-8">
-            <div className="bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur-xl shadow-lg">
-              <p className="text-sm text-gray-400 mb-2">
-                Total Productos
-              </p>
-
-              <h2 className="text-4xl font-black text-cyan-400">
-                {productCount}
-              </h2>
-            </div>
-
-            <div className="bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur-xl shadow-lg">
-              <p className="text-sm text-gray-400 mb-2">
-                Categorías
-              </p>
-
-              <h2 className="text-4xl font-black text-purple-400">
-                {totalCategories}
-              </h2>
-            </div>
-
-            <div className="bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur-xl shadow-lg overflow-hidden">
-              <p className="text-sm text-gray-400 mb-2">
-                Último Producto
-              </p>
-
-              <h2 className="text-2xl font-bold text-emerald-400 truncate">
-                {latestProduct}
-              </h2>
-            </div>
+      <div className="mb-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-6">
+          <div>
+            <h1 className="text-5xl font-black mb-3 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent tracking-tight">
+              Sistema de Código de Barras v1.0
+            </h1>
+            <p className={`${darkMode ? "text-gray-300" : "text-slate-600"} text-lg`}>
+              Genera, escanea y administra productos fácilmente.
+            </p>
           </div>
 
-          <div className="mt-6 flex flex-col md:flex-row gap-4">
-            <input
-              type="text"
-              placeholder="Buscar producto o código..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 h-14 rounded-2xl border border-white/10 bg-white/10 text-white placeholder-gray-400 px-5 outline-none focus:ring-2 focus:ring-cyan-400 backdrop-blur-md"
-            />
-
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className="h-14 rounded-2xl border border-white/10 bg-white/10 text-white px-5 outline-none focus:ring-2 focus:ring-cyan-400 backdrop-blur-md"
-            >
-              <option value="recent" className="text-black">
-                Más recientes
-              </option>
-
-              <option value="old" className="text-black">
-                Más antiguos
-              </option>
-
-              <option value="name" className="text-black">
-                Orden alfabético
-              </option>
-            </select>
-
+          <div className="flex items-center gap-4">
             <button
-              onClick={exportToExcel}
-              className="h-14 px-8 rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 text-black font-bold shadow-lg shadow-green-500/30 hover:scale-105 transition-all duration-300"
+              onClick={() => setDarkMode(!darkMode)}
+              className={`px-5 h-12 rounded-2xl font-semibold shadow-lg transition-all duration-300 ${
+                darkMode
+                  ? "bg-white text-black hover:bg-gray-200"
+                  : "bg-black text-white hover:bg-gray-800"
+              }`}
             >
-              Exportar Excel
+              {darkMode ? "☀️ Modo Claro" : "🌙 Modo Oscuro"}
             </button>
           </div>
         </div>
 
-        {/* ============================= */}
-        {/* FORMULARIO */}
-        {/* ============================= */}
-
-        <div className="bg-white/10 backdrop-blur-xl rounded-[32px] shadow-2xl p-8 mb-8 border border-white/10">
-          <h2 className="text-3xl font-bold mb-6 text-white">
-            Agregar Producto
-          </h2>
-
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-
-  <div>
-
-    <h1 className="text-5xl font-black bg-gradient-to-r from-indigo-700 to-blue-500 bg-clip-text text-transparent mb-3">
-      Barcode System
-    </h1>
-
-    <p className="text-slate-600 text-lg">
-      Genera, escanea y administra productos fácilmente.
-    </p>
-
-  </div>
-
-  <div className="flex flex-col items-end gap-4">
-
-    {/* BOTON DARK MODE */}
-
-    <button
-      onClick={() => setDarkMode(!darkMode)}
-      className={`
-        px-5
-        h-12
-        rounded-2xl
-        font-semibold
-        shadow-lg
-        transition-all
-        duration-300
-        ${
-          darkMode
-            ? "bg-white text-black hover:bg-gray-200"
-            : "bg-black text-white hover:bg-gray-800"
-        }
-      `}
-    >
-      {darkMode ? "☀️ Modo Claro" : "🌙 Modo Oscuro"}
-    </button>
-
-    {/* CONTADOR */}
-
-    <div className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white px-6 py-4 rounded-3xl shadow-lg">
-
-      <p className="text-sm opacity-80">
-        Productos Registrados
-      </p>
-
-      <h2 className="text-3xl font-bold">
-        {productCount}
-      </h2>
-
-    </div>
-
-  </div>
-
-</div>
-          
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="h-14 rounded-2xl border border-white/10 bg-white/10 text-white px-5 outline-none focus:ring-2 focus:ring-cyan-400 backdrop-blur-md"
-            >
-              <option value="General" className="text-black">General</option>
-              <option value="Electrónica" className="text-black">Electrónica</option>
-              <option value="Ropa" className="text-black">Ropa</option>
-              <option value="Comida" className="text-black">Comida</option>
-              <option value="Bebidas" className="text-black">Bebidas</option>
-              <option value="Tecnología" className="text-black">Tecnología</option>
-            </select>
-            <input
-              type="text"
-              placeholder="Nombre del producto"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  generateBarcode();
-                }
-              }}
-              className="flex-1 h-14 rounded-2xl border border-white/10 bg-white/10 text-white placeholder-gray-400 px-5 outline-none focus:ring-2 focus:ring-cyan-400 backdrop-blur-md"
-            />
-
-            <button
-              onClick={generateBarcode}
-              className="h-14 px-8 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold shadow-lg shadow-cyan-500/30 transition-all duration-300 hover:scale-105"
-            >
-              Generar Código
-            </button>
-
-            <button
-              onClick={() => setScannerOpen(true)}
-              className="h-14 px-8 rounded-2xl bg-white/10 border border-white/10 text-white font-semibold hover:bg-white/20 transition-all duration-300 hover:scale-105 backdrop-blur-md"
-            >
-              Escanear
-            </button>
+        {/* Buscador y filtros */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-8 mb-8">
+          <div className="bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur-xl shadow-lg">
+            <p className="text-sm text-gray-400 mb-2">Total Productos</p>
+            <h2 className="text-4xl font-black text-cyan-400">{productCount}</h2>
           </div>
 
-          {/* Resultado del escaneo */}
+          <div className="bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur-xl shadow-lg">
+            <p className="text-sm text-gray-400 mb-2">Categorías</p>
+            <h2 className="text-4xl font-black text-purple-400">{totalCategories}</h2>
+          </div>
 
-          {scanResult && (
-            <div className="mt-4 space-y-3">
-              <div className="p-4 rounded-2xl bg-green-100 text-green-800 break-all">
-                <strong>Código Escaneado:</strong> {scanResult}
-              </div>
+          <div className="bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur-xl shadow-lg overflow-hidden">
+            <p className="text-sm text-gray-400 mb-2">Último Producto</p>
+            <h2 className="text-2xl font-bold text-emerald-400 truncate">{latestProduct}</h2>
+          </div>
+        </div>
 
-              {scannedProduct ? (
-                <div className="p-4 rounded-2xl bg-white border border-green-200 shadow-sm">
-                  <h3 className="text-lg font-semibold text-green-700 mb-2">
-                    Producto Encontrado
-                  </h3>
+        <div className="mt-6 flex flex-col md:flex-row gap-4">
+          <input
+            type="text"
+            placeholder="Buscar producto o código..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="flex-1 h-14 rounded-2xl border border-white/10 bg-white/10 text-white placeholder-gray-400 px-5 outline-none focus:ring-2 focus:ring-cyan-400 backdrop-blur-md"
+          />
 
-                  <p>
-                    <strong>Nombre:</strong> {scannedProduct.name}
-                  </p>
-
-                  <p className="mt-1 break-all">
-                    <strong>Código:</strong> {scannedProduct.barcode}
-                  </p>
-                </div>
-              ) : (
-                <div className="p-4 rounded-2xl bg-yellow-100 text-yellow-800 border border-yellow-200">
-                  No se encontró un producto registrado con este código.
-                </div>
-              )}
-            </div>
-          )}
-
-        {/* ============================= */}
-        {/* LISTA DE PRODUCTOS */}
-        {/* ============================= */}
-
-        {products.length === 0 ? (
-          <div
-            className={
-              darkMode
-                ? "backdrop-blur-xl rounded-[32px] shadow-xl overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 bg-white/5 border border-white/10 text-white"
-                : "backdrop-blur-xl rounded-[32px] shadow-xl overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 bg-white/90 border border-white/50 text-black"
-            }
+          <select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+            className="h-14 rounded-2xl border border-white/10 bg-white/10 text-white px-5 outline-none focus:ring-2 focus:ring-cyan-400 backdrop-blur-md"
           >
-            No hay productos registrados todavía.
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.firebaseId}
-                product={product}
-                darkMode={darkMode}
-                onDelete={deleteProduct}
-                onEdit={() => {
-                  setEditingProduct(product);
-                  setNewName(product.name);
-                }}
-              />
-            ))}
+            <option value="recent" className="text-black">Más recientes</option>
+            <option value="old" className="text-black">Más antiguos</option>
+            <option value="name" className="text-black">Orden alfabético</option>
+          </select>
+
+          <button
+            onClick={exportToExcel}
+            className="h-14 px-8 rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 text-black font-bold shadow-lg shadow-green-500/30 hover:scale-105 transition-all duration-300"
+          >
+            Exportar Excel
+          </button>
+        </div>
+      </div>
+
+      {/* ============================= */}
+      {/* FORMULARIO */}
+      {/* ============================= */}
+
+      <div className="bg-white/10 backdrop-blur-xl rounded-[32px] shadow-2xl p-8 mb-8 border border-white/10">
+        <h2 className="text-3xl font-bold mb-6 text-white">Agregar Producto</h2>
+
+        <div className="flex flex-col md:flex-row gap-4">
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="h-14 rounded-2xl border border-white/10 bg-white/10 text-white px-5 outline-none focus:ring-2 focus:ring-cyan-400 backdrop-blur-md"
+          >
+            <option value="General" className="text-black">General</option>
+            <option value="Electrónica" className="text-black">Electrónica</option>
+            <option value="Ropa" className="text-black">Ropa</option>
+            <option value="Comida" className="text-black">Comida</option>
+            <option value="Bebidas" className="text-black">Bebidas</option>
+            <option value="Tecnología" className="text-black">Tecnología</option>
+          </select>
+
+          <input
+            type="text"
+            placeholder="Nombre del producto"
+            value={productName}
+            onChange={(e) => setProductName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                generateBarcode();
+              }
+            }}
+            className="flex-1 h-14 rounded-2xl border border-white/10 bg-white/10 text-white placeholder-gray-400 px-5 outline-none focus:ring-2 focus:ring-cyan-400 backdrop-blur-md"
+          />
+
+          <button
+            onClick={generateBarcode}
+            className="h-14 px-8 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold shadow-lg shadow-cyan-500/30 transition-all duration-300 hover:scale-105"
+          >
+            Generar Código
+          </button>
+
+          <button
+            onClick={() => setScannerOpen(true)}
+            className="h-14 px-8 rounded-2xl bg-white/10 border border-white/10 text-white font-semibold hover:bg-white/20 transition-all duration-300 hover:scale-105 backdrop-blur-md"
+          >
+            Escanear
+          </button>
+        </div>
+
+        {/* Resultado del escaneo */}
+        {scanResult && (
+          <div className="mt-4 space-y-3">
+            <div className="p-4 rounded-2xl bg-green-100 text-green-800 break-all">
+              <strong>Código Escaneado:</strong> {scanResult}
+            </div>
+
+            {scannedProduct ? (
+              <div className="p-4 rounded-2xl bg-white border border-green-200 shadow-sm text-black">
+                <h3 className="text-lg font-semibold text-green-700 mb-2">Producto Encontrado</h3>
+                <p><strong>Nombre:</strong> {scannedProduct.name}</p>
+                <p className="mt-1 break-all"><strong>Código:</strong> {scannedProduct.barcode}</p>
+              </div>
+            ) : (
+              <div className="p-4 rounded-2xl bg-yellow-100 text-yellow-800 border border-yellow-200">
+                No se encontró un producto registrado con este código.
+              </div>
+            )}
           </div>
         )}
+      </div>
 
-        {/* ============================= */}
-        {/* MODAL ESCANER */}
-        {/* ============================= */}
+      {/* ============================= */}
+      {/* LISTA DE PRODUCTOS */}
+      {/* ============================= */}
 
-        {scannerOpen && (
-          <Modal onClose={() => setScannerOpen(false)}>
-            <h2 className="text-3xl font-bold mb-6 text-white">
-              Escanear Código
-            </h2>
+      {products.length === 0 ? (
+        <div
+          className={
+            darkMode
+              ? "backdrop-blur-xl rounded-[32px] shadow-xl p-6 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 bg-white/5 border border-white/10 text-white"
+              : "backdrop-blur-xl rounded-[32px] shadow-xl p-6 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 bg-white/90 border border-white/50 text-black"
+          }
+        >
+          No hay productos registrados todavía.
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
+          {filteredProducts.map((product) => (
+            <ProductCard
+              key={product.firebaseId}
+              product={product}
+              darkMode={darkMode}
+              onDelete={deleteProduct}
+              onEdit={() => {
+                setEditingProduct(product);
+                setNewName(product.name);
+              }}
+            />
+          ))}
+        </div>
+      )}
 
-            <BarcodeScanner
-              onScan={(decodedText) => {
-                const normalizedCode = String(decodedText)
+      {/* ============================= */}
+      {/* MODAL ESCANER */}
+      {/* ============================= */}
+
+      {scannerOpen && (
+        <Modal onClose={() => setScannerOpen(false)}>
+          <h2 className="text-3xl font-bold mb-6 text-white">Escanear Código</h2>
+          <BarcodeScanner
+            onScan={(decodedText) => {
+              const normalizedCode = String(decodedText)
+                .replace(/\s+/g, "")
+                .trim();
+
+              setScanResult(normalizedCode);
+
+              const foundProduct = products.find((product) => {
+                const savedCode = String(product.barcode)
                   .replace(/\s+/g, "")
                   .trim();
 
-                setScanResult(normalizedCode);
+                return savedCode === normalizedCode;
+              });
 
-                const foundProduct = products.find((product) => {
-                  const savedCode = String(product.barcode)
-                    .replace(/\s+/g, "")
-                    .trim();
+              setScannedProduct(foundProduct || null);
 
-                  return savedCode === normalizedCode;
-                });
+              if (foundProduct) {
+                alert("Producto encontrado: " + foundProduct.name);
+              }
 
-                setScannedProduct(foundProduct || null);
+              setScannerOpen(false);
+            }}
+          />
+        </Modal>
+      )}
 
-                if (foundProduct) {
-                  alert("Producto encontrado: " + foundProduct.name);
-                }
+      {/* ============================= */}
+      {/* MODAL EDITAR */}
+      {/* ============================= */}
 
-                setScannerOpen(false);
-              }}
+      {editingProduct && (
+        <Modal onClose={() => setEditingProduct(null)}>
+          <h2 className="text-3xl font-bold mb-6 text-white">Cambiar Nombre</h2>
+          <div className="space-y-4">
+            <input
+              type="text"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              className="w-full h-12 rounded-2xl border border-gray-300 px-4 text-black"
             />
-          </Modal>
-        )}
-
-        {/* ============================= */}
-        {/* MODAL EDITAR */}
-        {/* ============================= */}
-
-        {editingProduct && (
-          <Modal onClose={() => setEditingProduct(null)}>
-            <h2 className="text-3xl font-bold mb-6 text-white">
-              Cambiar Nombre
-            </h2>
-
-            <div className="space-y-4">
-              <input
-                type="text"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                className="w-full h-12 rounded-2xl border border-gray-300 px-4"
-              />
-
-              <button
-                onClick={saveNewName}
-                className="w-full h-12 rounded-2xl bg-black text-white"
-              >
-                Guardar Cambios
-              </button>
-            </div>
-          </Modal>
-        )}
-      </div>
-   
+            <button
+              onClick={saveNewName}
+              className="w-full h-12 rounded-2xl bg-cyan-500 text-black font-bold hover:bg-cyan-400 transition"
+            >
+              Guardar Cambios
+            </button>
+          </div>
+        </Modal>
+      )}
+    </div>
   );
 }
 
@@ -636,27 +552,21 @@ function ProductCard({
   return (
     <div className="bg-white/10 backdrop-blur-xl rounded-[32px] shadow-2xl border border-white/10 overflow-hidden hover:scale-[1.02] hover:shadow-cyan-500/20 transition-all duration-300">
       {/* Header */}
-
       <div className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white p-5">
         <div className="flex justify-between items-start gap-3">
           <div className="min-w-0">
-            <h3 className="text-xl font-bold break-words">
-              {product.name}
-            </h3>
-
+            <h3 className="text-xl font-bold break-words">{product.name}</h3>
             <div className="flex items-center gap-2 mt-2 mb-2">
               <span className="px-3 py-1 rounded-full bg-white/20 text-xs font-semibold">
                 {product.category || "General"}
               </span>
             </div>
-
             <p className="text-sm text-gray-300 mt-1 break-all">
               Código: {product.barcode}
             </p>
           </div>
 
           {/* Botones */}
-
           <div className="flex gap-2 shrink-0">
             <button
               onClick={onEdit}
@@ -664,7 +574,6 @@ function ProductCard({
             >
               Editar
             </button>
-
             <button
               onClick={() => onDelete(product.firebaseId)}
               className="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition"
@@ -676,30 +585,16 @@ function ProductCard({
       </div>
 
       {/* Código de barras */}
-
       <div className="p-6">
         <div
-  className={`
-    rounded-3xl
-    p-6
-    w-full
-    max-w-md
-    relative
-    shadow-2xl
-    transition-all
-    duration-300
-    ${
-      darkMode
-        ? "bg-slate-900 text-white"
-        : "bg-white text-black"
-    }
-  `}
->
-          <svg ref={svgRef}></svg>
+          className={`rounded-3xl p-6 w-full max-w-md relative shadow-2xl transition-all duration-300 ${
+            darkMode ? "bg-slate-900 text-white" : "bg-white text-black"
+          }`}
+        >
+          <svg ref={svgRef} className="w-full"></svg>
         </div>
 
         {/* Acciones */}
-
         <div className="mt-5 flex flex-col gap-3">
           <button
             onClick={downloadBarcode}
@@ -757,7 +652,6 @@ function BarcodeScanner({ onScan }) {
       <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-2xl p-4 text-sm">
         Permite acceso a la cámara y apunta al código de barras.
       </div>
-
       <div id="scanner" className="w-full min-h-[250px]" />
     </div>
   );
@@ -775,11 +669,10 @@ function Modal({ children, onClose }) {
       <div className="bg-slate-900 border border-white/10 text-white rounded-[32px] p-8 w-full max-w-md relative shadow-2xl">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-2xl"
+          className="absolute top-4 right-4 text-2xl text-gray-400 hover:text-white transition"
         >
           ×
         </button>
-
         {children}
       </div>
     </div>

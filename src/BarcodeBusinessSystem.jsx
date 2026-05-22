@@ -390,27 +390,7 @@ export default function BarcodeBusinessSystem() {
   </div>
 
 </div>
-            <div className="flex justify-end mb-4">
-  <button
-    onClick={() => setDarkMode(!darkMode)}
-    className={`
-      px-5
-      h-12
-      rounded-2xl
-      font-semibold
-      shadow-lg
-      transition-all
-      duration-300
-      ${
-        darkMode
-          ? "bg-white text-black hover:bg-gray-200"
-          : "bg-black text-white hover:bg-gray-800"
-      }
-    `}
-  >
-    {darkMode ? "☀️ Modo Claro" : "🌙 Modo Oscuro"}
-  </button>
-</div>
+          
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
@@ -509,17 +489,16 @@ export default function BarcodeBusinessSystem() {
         ) : (
           <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
             {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.firebaseId}
-                product={product}
-                onDelete={deleteProduct}
-                onEdit={() => {
-                  setEditingProduct(product);
-                  setNewName(product.name);
-                }}
-              />
-            ))}
-          </div>
+           <ProductCard
+  key={product.firebaseId}
+  product={product}
+  darkMode={darkMode}
+  onDelete={deleteProduct}
+  onEdit={() => {
+    setEditingProduct(product);
+    setNewName(product.name);
+  }}
+/>
         )}
 
         {/* ============================= */}
@@ -598,7 +577,12 @@ export default function BarcodeBusinessSystem() {
 ====================================================
 */
 
-function ProductCard({ product, onDelete, onEdit }) {
+function ProductCard({
+  product,
+  onDelete,
+  onEdit,
+  darkMode,
+}) {
   const svgRef = useRef(null);
 
   // =============================
@@ -807,6 +791,5 @@ function Modal({ children, onClose }) {
 
         {children}
       </div>
-    </div>
   );
 }

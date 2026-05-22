@@ -489,18 +489,17 @@ export default function BarcodeBusinessSystem() {
         ) : (
        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
   {filteredProducts.map((product) => (
-    <ProductCard
-      key={product.firebaseId}
-      product={product}
-      darkMode={darkMode}
-      onDelete={deleteProduct}
-      onEdit={() => {
-        setEditingProduct(product);
-        setNewName(product.name);
-      }}
-    />
-  ))}
-</div>
+  <ProductCard
+    key={product.firebaseId}
+    product={product}
+    darkMode={darkMode}
+    onDelete={deleteProduct}
+    onEdit={() => {
+      setEditingProduct(product);
+      setNewName(product.name);
+    }}
+  />
+))} 
 
         {/* ============================= */}
         {/* MODAL ESCANER */}

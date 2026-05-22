@@ -190,11 +190,6 @@ const exportToExcel = () => {
       console.error(error);
     }
   };
-  // =============================
-// BUSCADOR
-// =============================
-
-const [searchTerm, setSearchTerm] = useState("");
 
   // =============================
   // TOTAL PRODUCTOS

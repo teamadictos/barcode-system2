@@ -30,6 +30,11 @@ export default function BarcodeBusinessSystem() {
 
   const [products, setProducts] = useState([]);
   const [productName, setProductName] = useState("");
+  // =============================
+// BUSCADOR
+// =============================
+
+const [searchTerm, setSearchTerm] = useState("");
 
   const [editingProduct, setEditingProduct] = useState(null);
   const [newName, setNewName] = useState("");
@@ -196,6 +201,35 @@ const exportToExcel = () => {
   );
 
   // =============================
+// BUSCADOR EN TIEMPO REAL
+// =============================
+
+const [searchTerm, setSearchTerm] = useState("");
+
+const filteredProducts = useMemo(() => {
+
+  return products.filter((product) => {
+
+    const name =
+      String(product.name || "")
+        .toLowerCase();
+
+    const barcode =
+      String(product.barcode || "")
+        .toLowerCase();
+
+    const search =
+      searchTerm.toLowerCase();
+
+    return (
+      name.includes(search) ||
+      barcode.includes(search)
+    );
+  });
+
+}, [products, searchTerm]);
+
+  // =============================
   // RENDER
   // =============================
 
@@ -234,6 +268,38 @@ const exportToExcel = () => {
         <h2 className="text-3xl font-bold">
           {productCount}
         </h2>
+
+        {/* BUSCADOR */}
+
+<div className="mt-6">
+
+  <input
+    type="text"
+    placeholder="Buscar producto o código..."
+    value={searchTerm}
+    onChange={(e) =>
+      setSearchTerm(e.target.value)
+    }
+    className="
+      w-full
+      md:w-[420px]
+      h-14
+      rounded-2xl
+      bg-white/10
+      border
+      border-white/10
+      backdrop-blur-xl
+      px-5
+      text-white
+      placeholder-gray-400
+      outline-none
+      focus:ring-2
+      focus:ring-cyan-400
+      shadow-lg
+    "
+  />
+
+</div>
 
       </div>
        <div className="mt-5">
@@ -367,7 +433,7 @@ const exportToExcel = () => {
 
           <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
 
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
 
               <ProductCard
                 key={product.firebaseId}

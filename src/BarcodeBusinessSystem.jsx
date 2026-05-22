@@ -335,7 +335,61 @@ export default function BarcodeBusinessSystem() {
             Agregar Producto
           </h2>
 
-          <div className="flex flex-col md:flex-row gap-3">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+
+  <div>
+
+    <h1 className="text-5xl font-black bg-gradient-to-r from-indigo-700 to-blue-500 bg-clip-text text-transparent mb-3">
+      Barcode System
+    </h1>
+
+    <p className="text-slate-600 text-lg">
+      Genera, escanea y administra productos fácilmente.
+    </p>
+
+  </div>
+
+  <div className="flex flex-col items-end gap-4">
+
+    {/* BOTON DARK MODE */}
+
+    <button
+      onClick={() => setDarkMode(!darkMode)}
+      className={`
+        px-5
+        h-12
+        rounded-2xl
+        font-semibold
+        shadow-lg
+        transition-all
+        duration-300
+        ${
+          darkMode
+            ? "bg-white text-black hover:bg-gray-200"
+            : "bg-black text-white hover:bg-gray-800"
+        }
+      `}
+    >
+      {darkMode ? "☀️ Modo Claro" : "🌙 Modo Oscuro"}
+    </button>
+
+    {/* CONTADOR */}
+
+    <div className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white px-6 py-4 rounded-3xl shadow-lg">
+
+      <p className="text-sm opacity-80">
+        Productos Registrados
+      </p>
+
+      <h2 className="text-3xl font-bold">
+        {productCount}
+      </h2>
+
+    </div>
+
+  </div>
+
+</div>
             <div className="flex justify-end mb-4">
   <button
     onClick={() => setDarkMode(!darkMode)}

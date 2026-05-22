@@ -231,12 +231,13 @@ export default function BarcodeBusinessSystem() {
   // Render principal
   // =============================
 
-  <div
-    className={`min-h-screen p-6 transition-all duration-500 ${
-      darkMode
-        ? "bg-gradient-to-br from-slate-950 via-slate-900 to-black text-white"
-        : "bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 text-black"
-    }`}
+  return (
+    <div
+      className={`min-h-screen p-6 transition-all duration-500 ${
+        darkMode
+          ? "bg-gradient-to-br from-slate-950 via-slate-900 to-black text-white"
+          : "bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 text-black"
+      }`}
   >
         {/* ============================= */}
         {/* HEADER */}
@@ -486,19 +487,21 @@ export default function BarcodeBusinessSystem() {
             No hay productos registrados todavía.
           </div>
         ) : (
-       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
-  {filteredProducts.map((product) => (
-  <ProductCard
-    key={product.firebaseId}
-    product={product}
-    darkMode={darkMode}
-    onDelete={deleteProduct}
-    onEdit={() => {
-      setEditingProduct(product);
-      setNewName(product.name);
-    }}
-  />
-))} 
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
+            {filteredProducts.map((product) => (
+              <ProductCard
+                key={product.firebaseId}
+                product={product}
+                darkMode={darkMode}
+                onDelete={deleteProduct}
+                onEdit={() => {
+                  setEditingProduct(product);
+                  setNewName(product.name);
+                }}
+              />
+            ))}
+          </div>
+        )}
 
         {/* ============================= */}
         {/* MODAL ESCANER */}
@@ -792,3 +795,4 @@ function Modal({ children, onClose }) {
       </div>
     </div>
   );
+}

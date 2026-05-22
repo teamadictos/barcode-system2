@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import JsBarcode from "jsbarcode";
 import { Html5QrcodeScanner } from "html5-qrcode";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 // Firebase
 import { db } from "./firebase";
@@ -72,6 +74,39 @@ export default function BarcodeBusinessSystem() {
 
     return () => unsubscribe();
   }, []);
+
+  // =============================
+  // EXPORTAR A EXCEL
+  // =============================
+
+  const exportToExcel = () => {
+    const data = products.map((product) => ({
+      Nombre: product.name,
+      Codigo: product.barcode,
+      Fecha: new Date(product.createdAt).toLocaleString(),
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Productos"
+    );
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    const fileData = new Blob([excelBuffer], {
+      type:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+    });
+
+    saveAs(fileData, "productos.xlsx");
+  };
 
   // =============================
   // Generar nuevo código de barras
@@ -222,6 +257,13 @@ export default function BarcodeBusinessSystem() {
                 Orden alfabético
               </option>
             </select>
+
+            <button
+              onClick={exportToExcel}
+              className="h-14 px-8 rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 text-black font-bold shadow-lg shadow-green-500/30 hover:scale-105 transition-all duration-300"
+            >
+              Exportar Excel
+            </button>
           </div>
         </div>
 

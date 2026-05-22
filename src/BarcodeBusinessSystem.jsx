@@ -43,6 +43,7 @@ export default function BarcodeBusinessSystem() {
   const [scanResult, setScanResult] = useState("");
   const [scannedProduct, setScannedProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("recent");
 
   // =============================
   // CARGAR PRODUCTOS FIREBASE
@@ -199,6 +200,51 @@ const exportToExcel = () => {
     () => products.length,
     [products]
   );
+  // =============================
+// FILTRAR PRODUCTOS inicia aqui prueba
+// =============================
+const filteredProducts = useMemo(() => {
+
+  let filtered = [...products];
+
+  // BUSCADOR
+
+  filtered = filtered.filter((product) => {
+
+    const text =
+      `${product.name} ${product.barcode}`.toLowerCase();
+
+    return text.includes(searchTerm.toLowerCase());
+  });
+
+  // FILTROS
+
+  if (filterType === "recent") {
+
+    filtered.sort(
+      (a, b) => b.createdAt - a.createdAt
+    );
+
+  } else if (filterType === "old") {
+
+    filtered.sort(
+      (a, b) => a.createdAt - b.createdAt
+    );
+
+  } else if (filterType === "name") {
+
+    filtered.sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+  }
+
+  return filtered;
+
+}, [products, searchTerm, filterType]);
+  // =============================
+// FILTRAR PRODUCTOS  termina aqui
+// =============================
+
 
   // =============================
 // FILTRAR PRODUCTOS
@@ -266,6 +312,67 @@ const filteredProducts = useMemo(() => {
         <h2 className="text-3xl font-bold">
           {productCount}
         </h2>
+
+        <div className="mt-6 flex flex-col md:flex-row gap-4">
+
+  {/* BUSCADOR */}
+
+  <input
+    type="text"
+    placeholder="Buscar producto o código..."
+    value={searchTerm}
+    onChange={(e) =>
+      setSearchTerm(e.target.value)
+    }
+    className="
+      flex-1
+      h-12
+      px-4
+      rounded-2xl
+      border
+      border-gray-300
+      bg-white
+      shadow-sm
+      outline-none
+      focus:ring-2
+      focus:ring-blue-500
+    "
+  />
+
+  {/* FILTROS */}
+
+  <select
+    value={filterType}
+    onChange={(e) =>
+      setFilterType(e.target.value)
+    }
+    className="
+      h-12
+      px-4
+      rounded-2xl
+      border
+      border-gray-300
+      bg-white
+      shadow-sm
+      outline-none
+      focus:ring-2
+      focus:ring-blue-500
+    "
+  >
+    <option value="recent">
+      Más recientes
+    </option>
+
+    <option value="old">
+      Más antiguos
+    </option>
+
+    <option value="name">
+      Orden alfabético
+    </option>
+  </select>
+
+</div>
 
  {/* ============================= */}
 {/* BUSCADOR EN TIEMPO REAL */}

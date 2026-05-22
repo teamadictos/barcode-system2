@@ -44,6 +44,7 @@ export default function BarcodeBusinessSystem() {
 
   // Filtro de orden
   const [filterType, setFilterType] = useState("recent");
+  const [darkMode, setDarkMode] = useState(false);
 
   const [editingProduct, setEditingProduct] = useState(null);
   const [newName, setNewName] = useState("");
@@ -231,8 +232,13 @@ export default function BarcodeBusinessSystem() {
   // =============================
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-gray-900 to-black p-6 text-white">
-      <div className="max-w-7xl mx-auto">
+  <div
+    className={`min-h-screen p-6 transition-all duration-500 ${
+      darkMode
+        ? "bg-gradient-to-br from-slate-950 via-slate-900 to-black text-white"
+        : "bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 text-black"
+    }`}
+  >
         {/* ============================= */}
         {/* HEADER */}
         {/* ============================= */}
@@ -330,6 +336,27 @@ export default function BarcodeBusinessSystem() {
           </h2>
 
           <div className="flex flex-col md:flex-row gap-3">
+            <div className="flex justify-end mb-4">
+  <button
+    onClick={() => setDarkMode(!darkMode)}
+    className={`
+      px-5
+      h-12
+      rounded-2xl
+      font-semibold
+      shadow-lg
+      transition-all
+      duration-300
+      ${
+        darkMode
+          ? "bg-white text-black hover:bg-gray-200"
+          : "bg-black text-white hover:bg-gray-800"
+      }
+    `}
+  >
+    {darkMode ? "☀️ Modo Claro" : "🌙 Modo Oscuro"}
+  </button>
+</div>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
@@ -406,7 +433,23 @@ export default function BarcodeBusinessSystem() {
         {/* ============================= */}
 
         {products.length === 0 ? (
-          <div className="bg-white rounded-3xl shadow-lg p-10 text-center text-gray-500">
+          <div
+  className={`
+    backdrop-blur-xl
+    rounded-[32px]
+    shadow-xl
+    overflow-hidden
+    hover:-translate-y-1
+    hover:shadow-2xl
+    transition-all
+    duration-300
+    ${
+      darkMode
+        ? "bg-white/5 border border-white/10 text-white"
+        : "bg-white/90 border border-white/50 text-black"
+    }
+  `}
+>
             No hay productos registrados todavía.
           </div>
         ) : (
@@ -606,7 +649,23 @@ function ProductCard({ product, onDelete, onEdit }) {
       {/* Código de barras */}
 
       <div className="p-6">
-        <div className="bg-white rounded-3xl p-6 flex justify-center overflow-x-auto shadow-inner">
+        <div
+  className={`
+    rounded-3xl
+    p-6
+    w-full
+    max-w-md
+    relative
+    shadow-2xl
+    transition-all
+    duration-300
+    ${
+      darkMode
+        ? "bg-slate-900 text-white"
+        : "bg-white text-black"
+    }
+  `}
+>
           <svg ref={svgRef}></svg>
         </div>
 

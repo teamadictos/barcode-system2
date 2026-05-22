@@ -547,7 +547,7 @@ function ProductCard({
 
           <button
             onClick={downloadBarcode}
-            className="w-full h-12 rounded-2xl bg-black text-white font-semibold hover:opacity-90 transition"
+            className="w-full h-14 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-700 text-white font-bold hover:scale-[1.02] shadow-lg transition-all duration-300"
           >
             Descargar Código
           </button>

@@ -248,7 +248,6 @@ const filteredProducts = useMemo(() => {
 // FILTRAR PRODUCTOS
 // =============================
 
-const filteredProducts = useMemo(() => {
 
   return products.filter((product) => {
 

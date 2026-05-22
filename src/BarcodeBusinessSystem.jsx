@@ -197,7 +197,7 @@ export default function BarcodeBusinessSystem() {
 
         {/* FORMULARIO */}
 
-        <div className="bg-white rounded-3xl shadow-lg p-6 mb-8 border border-gray-100">
+        <div className="bg-white/80 backdrop-blur-xl rounded-[30px] shadow-2xl p-8 mb-10 border border-white/50">
 
           <h2 className="text-2xl font-semibold mb-4">
             Agregar Producto
@@ -487,7 +487,6 @@ function ProductCard({
   return (
 
 <div className="bg-white/90 backdrop-blur-xl rounded-[32px] shadow-xl border border-white/50 overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
-
       {/* HEADER */}
 
       <div className="bg-gradient-to-r from-black to-gray-800 text-white p-4">

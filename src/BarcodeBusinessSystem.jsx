@@ -4,14 +4,14 @@ import { Html5QrcodeScanner } from "html5-qrcode";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
-// Firebase
-import { db, auth } from "./firebase"; // <-- Importamos db y auth
+// Firebase (Importación unificada y corregida)
+import { db, auth } from "./firebase"; 
 
 import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged
-} from "firebase/auth"; // <-- Métodos de autenticación de Firebase
+} from "firebase/auth";
 
 import {
   collection,
@@ -26,15 +26,6 @@ import {
 ====================================================
  SISTEMA DE CÓDIGO DE BARRAS v1.1
 ====================================================
- Funciones:
- - Generar códigos de barra (Solo Admin)
- - Escanear con celular (Público)
- - Guardar en Firebase (Solo Admin)
- - Editar productos (Solo Admin)
- - Eliminar productos (Solo Admin)
- - Descargar códigos (Público)
- - Login / Logout nativo de Firebase
-====================================================
 */
 
 export default function BarcodeBusinessSystem() {
@@ -44,19 +35,12 @@ export default function BarcodeBusinessSystem() {
   const [products, setProducts] = useState([]);
   const [productName, setProductName] = useState("");
   const [category, setCategory] = useState("General");
-
-  // Buscador en tiempo real
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Filtro de orden
   const [filterType, setFilterType] = useState("recent");
   const [darkMode, setDarkMode] = useState(false);
-
   const [editingProduct, setEditingProduct] = useState(null);
   const [newName, setNewName] = useState("");
-
   const [scannerOpen, setScannerOpen] = useState(false);
-
   const [scanResult, setScanResult] = useState("");
   const [scannedProduct, setScannedProduct] = useState(null);
 
@@ -68,7 +52,7 @@ export default function BarcodeBusinessSystem() {
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   // =============================
-  // Monitorear Estado de Sesión en tiempo real
+  // Monitorear Estado de Sesión
   // =============================
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -108,7 +92,6 @@ export default function BarcodeBusinessSystem() {
 
   // =============================
   // Cargar productos desde Firebase
-  // Tiempo real
   // =============================
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -129,7 +112,7 @@ export default function BarcodeBusinessSystem() {
   }, []);
 
   // =============================
-  // EXPORTAR A EXCEL (Protegido)
+  // EXPORTAR A EXCEL
   // =============================
   const exportToExcel = () => {
     if (!isAdmin) {
@@ -145,12 +128,7 @@ export default function BarcodeBusinessSystem() {
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-
-    XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
-      "Productos"
-    );
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Productos");
 
     const excelBuffer = XLSX.write(workbook, {
       bookType: "xlsx",
@@ -158,15 +136,14 @@ export default function BarcodeBusinessSystem() {
     });
 
     const fileData = new Blob([excelBuffer], {
-      type:
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
     });
 
     saveAs(fileData, "productos.xlsx");
   };
 
   // =============================
-  // Generar nuevo código de barras (Protegido)
+  // Generar nuevo código de barras
   // =============================
   const generateBarcode = async () => {
     if (!isAdmin) {
@@ -175,17 +152,14 @@ export default function BarcodeBusinessSystem() {
     }
 
     const trimmedName = String(productName || "").trim();
-
     if (!trimmedName) {
       alert("Debes escribir el nombre del producto");
       return;
     }
 
-    // Genera un código único
     const barcode = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
 
     try {
-      // Guardar en Firebase
       await addDoc(collection(db, "products"), {
         id: barcode,
         category,
@@ -203,7 +177,7 @@ export default function BarcodeBusinessSystem() {
   };
 
   // =============================
-  // Eliminar producto (Protegido)
+  // Eliminar producto
   // =============================
   const deleteProduct = async (firebaseId) => {
     if (!isAdmin) {
@@ -218,7 +192,7 @@ export default function BarcodeBusinessSystem() {
   };
 
   // =============================
-  // Guardar nuevo nombre (Protegido)
+  // Guardar nuevo nombre
   // =============================
   const saveNewName = async () => {
     if (!isAdmin) return;
@@ -240,41 +214,27 @@ export default function BarcodeBusinessSystem() {
     }
   };
 
-  // =============================
-  // Cantidad total de productos
-  // =============================
+  // Dashboard calculations
   const productCount = useMemo(() => products.length, [products]);
 
-  // =============================
-  // DASHBOARD STATS
-  // =============================
   const totalCategories = useMemo(() => {
-    const categories = new Set(
-      products.map((p) => p.category || "General")
-    );
-
+    const categories = new Set(products.map((p) => p.category || "General"));
     return categories.size;
   }, [products]);
 
   const latestProduct = useMemo(() => {
     if (products.length === 0) return "Sin productos";
-
     return products[0]?.name || "Sin productos";
   }, [products]);
 
-  // =============================
-  // FILTRAR PRODUCTOS
-  // =============================
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
-    // Buscar por nombre o código
     filtered = filtered.filter((product) => {
       const text = `${product.name} ${product.barcode} ${product.category || ""}`.toLowerCase();
       return text.includes(searchTerm.toLowerCase());
     });
 
-    // Ordenar
     if (filterType === "recent") {
       filtered.sort((a, b) => b.createdAt - a.createdAt);
     } else if (filterType === "old") {
@@ -286,9 +246,6 @@ export default function BarcodeBusinessSystem() {
     return filtered;
   }, [products, searchTerm, filterType]);
 
-  // =============================
-  // Render principal
-  // =============================
   return (
     <div
       className={`min-h-screen p-6 transition-all duration-500 ${
@@ -297,9 +254,7 @@ export default function BarcodeBusinessSystem() {
           : "bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 text-black"
       }`}
     >
-      {/* ============================= */}
       {/* HEADER */}
-      {/* ============================= */}
       <div className="mb-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-6">
           <div>
@@ -312,7 +267,6 @@ export default function BarcodeBusinessSystem() {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Botón de Login dinámico */}
             {isAdmin ? (
               <button
                 onClick={handleLogout}
@@ -342,7 +296,7 @@ export default function BarcodeBusinessSystem() {
           </div>
         </div>
 
-        {/* Buscador y filtros */}
+        {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-8 mb-8">
           <div className="bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur-xl shadow-lg">
             <p className="text-sm text-gray-400 mb-2">Total Productos</p>
@@ -360,6 +314,7 @@ export default function BarcodeBusinessSystem() {
           </div>
         </div>
 
+        {/* Buscador, Filtros e Informes */}
         <div className="mt-6 flex flex-col md:flex-row gap-4">
           <input
             type="text"
@@ -393,9 +348,7 @@ export default function BarcodeBusinessSystem() {
         </div>
       </div>
 
-      {/* ============================= */}
-      {/* FORMULARIO (Bloqueado visualmente si no es admin) */}
-      {/* ============================= */}
+      {/* FORMULARIO */}
       <div className={`bg-white/10 backdrop-blur-xl rounded-[32px] shadow-2xl p-8 mb-8 border border-white/10 relative overflow-hidden transition-all duration-300 ${!isAdmin && "opacity-60"}`}>
         {!isAdmin && (
           <div className="absolute inset-0 bg-black/50 backdrop-blur-xs flex flex-col items-center justify-center z-10 p-4 text-center">
@@ -456,7 +409,6 @@ export default function BarcodeBusinessSystem() {
           </button>
         </div>
 
-        {/* Resultado del escaneo */}
         {scanResult && (
           <div className="mt-4 space-y-3">
             <div className="p-4 rounded-2xl bg-green-100 text-green-800 break-all">
@@ -478,9 +430,7 @@ export default function BarcodeBusinessSystem() {
         )}
       </div>
 
-      {/* ============================= */}
       {/* LISTA DE PRODUCTOS */}
-      {/* ============================= */}
       {products.length === 0 ? (
         <div
           className={
@@ -498,7 +448,7 @@ export default function BarcodeBusinessSystem() {
               key={product.firebaseId}
               product={product}
               darkMode={darkMode}
-              isAdmin={isAdmin} // Enviamos privilegios a las tarjetas
+              isAdmin={isAdmin}
               onDelete={deleteProduct}
               onEdit={() => {
                 setEditingProduct(product);
@@ -509,9 +459,7 @@ export default function BarcodeBusinessSystem() {
         </div>
       )}
 
-      {/* ============================= */}
-      {/* MODAL DE LOGIN (ADMIN) */}
-      {/* ============================= */}
+      {/* MODAL LOGIN */}
       {showLoginModal && (
         <Modal onClose={() => setShowLoginModal(false)}>
           <h2 className="text-3xl font-bold mb-3 text-white">Ingreso Admin</h2>
@@ -558,43 +506,31 @@ export default function BarcodeBusinessSystem() {
         </Modal>
       )}
 
-      {/* ============================= */}
       {/* MODAL ESCANER */}
-      {/* ============================= */}
       {scannerOpen && (
         <Modal onClose={() => setScannerOpen(false)}>
           <h2 className="text-3xl font-bold mb-6 text-white">Escanear Código</h2>
           <BarcodeScanner
             onScan={(decodedText) => {
-              const normalizedCode = String(decodedText)
-                .replace(/\s+/g, "")
-                .trim();
-
+              const normalizedCode = String(decodedText).replace(/\s+/g, "").trim();
               setScanResult(normalizedCode);
 
               const foundProduct = products.find((product) => {
-                const savedCode = String(product.barcode)
-                  .replace(/\s+/g, "")
-                  .trim();
-
+                const savedCode = String(product.barcode).replace(/\s+/g, "").trim();
                 return savedCode === normalizedCode;
               });
 
               setScannedProduct(foundProduct || null);
-
               if (foundProduct) {
                 alert("Producto encontrado: " + foundProduct.name);
               }
-
               setScannerOpen(false);
             }}
           />
         </Modal>
       )}
 
-      {/* ============================= */}
       {/* MODAL EDITAR */}
-      {/* ============================= */}
       {editingProduct && (
         <Modal onClose={() => setEditingProduct(null)}>
           <h2 className="text-3xl font-bold mb-6 text-white">Cambiar Nombre</h2>
@@ -618,23 +554,12 @@ export default function BarcodeBusinessSystem() {
   );
 }
 
-/*
-====================================================
- TARJETA DEL PRODUCTO
-====================================================
-*/
-function ProductCard({
-  product,
-  onDelete,
-  onEdit,
-  darkMode,
-  isAdmin,
-}) {
+/* Tarjeta de Producto */
+function ProductCard({ product, onDelete, onEdit, darkMode, isAdmin }) {
   const svgRef = useRef(null);
 
   useEffect(() => {
     if (!svgRef.current) return;
-
     JsBarcode(svgRef.current, product.barcode, {
       format: "CODE128",
       width: 2,
@@ -653,15 +578,11 @@ function ProductCard({
     try {
       const serializer = new XMLSerializer();
       const source = serializer.serializeToString(svg);
-      const blob = new Blob([source], {
-        type: "image/svg+xml;charset=utf-8",
-      });
-
+      const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
       link.download = `${product.name}.svg`;
-
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -682,24 +603,15 @@ function ProductCard({
                 {product.category || "General"}
               </span>
             </div>
-            <p className="text-sm text-gray-300 mt-1 break-all">
-              Código: {product.barcode}
-            </p>
+            <p className="text-sm text-gray-300 mt-1 break-all">Código: {product.barcode}</p>
           </div>
 
-          {/* Botones de acción editables condicionales */}
           {isAdmin && (
             <div className="flex gap-2 shrink-0">
-              <button
-                onClick={onEdit}
-                className="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-sm font-semibold backdrop-blur-md transition"
-              >
+              <button onClick={onEdit} className="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-sm font-semibold backdrop-blur-md transition">
                 Editar
               </button>
-              <button
-                onClick={() => onDelete(product.firebaseId)}
-                className="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition"
-              >
+              <button onClick={() => onDelete(product.firebaseId)} className="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition">
                 Eliminar
               </button>
             </div>
@@ -708,26 +620,15 @@ function ProductCard({
       </div>
 
       <div className="p-6">
-        <div
-          className={`rounded-3xl p-6 w-full max-w-md relative shadow-2xl transition-all duration-300 ${
-            darkMode ? "bg-slate-900 text-white" : "bg-white text-black"
-          }`}
-        >
+        <div className={`rounded-3xl p-6 w-full max-w-md relative shadow-2xl transition-all duration-300 ${darkMode ? "bg-slate-900 text-white" : "bg-white text-black"}`}>
           <svg ref={svgRef} className="w-full"></svg>
         </div>
-
         <div className="mt-5 flex flex-col gap-3">
-          <button
-            onClick={downloadBarcode}
-            className="w-full h-14 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold hover:opacity-90 transition-all duration-300 shadow-lg"
-          >
+          <button onClick={downloadBarcode} className="w-full h-14 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold hover:opacity-90 transition-all duration-300 shadow-lg">
             Descargar Código
           </button>
-
           <div className="bg-white/10 border border-white/10 rounded-2xl p-4 text-center backdrop-blur-md">
-            <p className="text-xs text-gray-300">
-              Escanea este código desde cualquier dispositivo
-            </p>
+            <p className="text-xs text-gray-300">Escanea este código desde cualquier dispositivo</p>
           </div>
         </div>
       </div>
@@ -735,30 +636,13 @@ function ProductCard({
   );
 }
 
-/*
-====================================================
- ESCANER
-====================================================
-*/
+/* Escáner */
 function BarcodeScanner({ onScan }) {
   useEffect(() => {
-    let scannerInstance;
-
-    scannerInstance = new Html5QrcodeScanner(
-      "scanner",
-      { fps: 10, qrbox: 250 },
-      false
-    );
-
-    scannerInstance.render(
-      (decodedText) => { onScan(decodedText); },
-      () => {}
-    );
-
+    let scannerInstance = new Html5QrcodeScanner("scanner", { fps: 10, qrbox: 250 }, false);
+    scannerInstance.render((decodedText) => { onScan(decodedText); }, () => {});
     return () => {
-      if (scannerInstance) {
-        scannerInstance.clear().catch(() => {});
-      }
+      if (scannerInstance) scannerInstance.clear().catch(() => {});
     };
   }, [onScan]);
 
@@ -772,21 +656,12 @@ function BarcodeScanner({ onScan }) {
   );
 }
 
-/*
-====================================================
- MODAL
-====================================================
-*/
+/* Modal Generic */
 function Modal({ children, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
       <div className="bg-slate-900 border border-white/10 text-white rounded-[32px] p-8 w-full max-w-md relative shadow-2xl">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-2xl text-gray-400 hover:text-white transition"
-        >
-          ×
-        </button>
+        <button onClick={onClose} className="absolute top-4 right-4 text-2xl text-gray-400 hover:text-white transition">×</button>
         {children}
       </div>
     </div>

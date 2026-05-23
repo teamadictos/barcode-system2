@@ -6,6 +6,12 @@ import { saveAs } from "file-saver";
 
 // Firebase
 import { db } from "./firebase";
+import { db, auth } from "./firebase"; // <-- Importamos auth de tus configuraciones
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from "firebase/auth";
 
 import {
   collection,

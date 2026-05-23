@@ -5,13 +5,13 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
 // Firebase
-import { db } from "./firebase";
-import { db, auth } from "./firebase"; // <-- Importamos auth de tus configuraciones
+import { db, auth } from "./firebase"; // <-- Importamos db y auth
+
 import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged
-} from "firebase/auth";
+} from "firebase/auth"; // <-- Métodos de autenticación de Firebase
 
 import {
   collection,
@@ -24,15 +24,16 @@ import {
 
 /*
 ====================================================
- SISTEMA DE CÓDIGO DE BARRAS v1.0
+ SISTEMA DE CÓDIGO DE BARRAS v1.1
 ====================================================
  Funciones:
- - Generar códigos de barra
- - Escanear con celular
- - Guardar en Firebase
- - Editar productos
- - Eliminar productos
- - Descargar códigos
+ - Generar códigos de barra (Solo Admin)
+ - Escanear con celular (Público)
+ - Guardar en Firebase (Solo Admin)
+ - Editar productos (Solo Admin)
+ - Eliminar productos (Solo Admin)
+ - Descargar códigos (Público)
+ - Login / Logout nativo de Firebase
 ====================================================
 */
 
@@ -40,7 +41,6 @@ export default function BarcodeBusinessSystem() {
   // =============================
   // Estados principales
   // =============================
-
   const [products, setProducts] = useState([]);
   const [productName, setProductName] = useState("");
   const [category, setCategory] = useState("General");
@@ -60,11 +60,56 @@ export default function BarcodeBusinessSystem() {
   const [scanResult, setScanResult] = useState("");
   const [scannedProduct, setScannedProduct] = useState(null);
 
+  // Estados de Autenticación Admin
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // =============================
+  // Monitorear Estado de Sesión en tiempo real
+  // =============================
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+    });
+    return () => unsubscribeAuth();
+  }, []);
+
+  // =============================
+  // Acciones de Login y Logout
+  // =============================
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setAuthError("");
+    try {
+      await signInWithEmailAndPassword(auth, authEmail, authPassword);
+      setAuthEmail("");
+      setAuthPassword("");
+      setShowLoginModal(false);
+    } catch (error) {
+      console.error(error);
+      setAuthError("Credenciales incorrectas. Inténtalo de nuevo.");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
+
   // =============================
   // Cargar productos desde Firebase
   // Tiempo real
   // =============================
-
   useEffect(() => {
     const unsubscribe = onSnapshot(
       collection(db, "products"),
@@ -84,10 +129,14 @@ export default function BarcodeBusinessSystem() {
   }, []);
 
   // =============================
-  // EXPORTAR A EXCEL
+  // EXPORTAR A EXCEL (Protegido)
   // =============================
-
   const exportToExcel = () => {
+    if (!isAdmin) {
+      alert("Acción restringida solo para administradores.");
+      return;
+    }
+
     const data = products.map((product) => ({
       Nombre: product.name,
       Codigo: product.barcode,
@@ -117,10 +166,14 @@ export default function BarcodeBusinessSystem() {
   };
 
   // =============================
-  // Generar nuevo código de barras
+  // Generar nuevo código de barras (Protegido)
   // =============================
-
   const generateBarcode = async () => {
+    if (!isAdmin) {
+      alert("Debes ser administrador para agregar productos.");
+      return;
+    }
+
     const trimmedName = String(productName || "").trim();
 
     if (!trimmedName) {
@@ -150,10 +203,13 @@ export default function BarcodeBusinessSystem() {
   };
 
   // =============================
-  // Eliminar producto
+  // Eliminar producto (Protegido)
   // =============================
-
   const deleteProduct = async (firebaseId) => {
+    if (!isAdmin) {
+      alert("Acción restringida solo para administradores.");
+      return;
+    }
     try {
       await deleteDoc(doc(db, "products", firebaseId));
     } catch (error) {
@@ -162,10 +218,10 @@ export default function BarcodeBusinessSystem() {
   };
 
   // =============================
-  // Guardar nuevo nombre
+  // Guardar nuevo nombre (Protegido)
   // =============================
-
   const saveNewName = async () => {
+    if (!isAdmin) return;
     const trimmedName = newName.trim();
 
     if (!editingProduct || !trimmedName) {
@@ -187,13 +243,11 @@ export default function BarcodeBusinessSystem() {
   // =============================
   // Cantidad total de productos
   // =============================
-
   const productCount = useMemo(() => products.length, [products]);
 
   // =============================
   // DASHBOARD STATS
   // =============================
-
   const totalCategories = useMemo(() => {
     const categories = new Set(
       products.map((p) => p.category || "General")
@@ -211,7 +265,6 @@ export default function BarcodeBusinessSystem() {
   // =============================
   // FILTRAR PRODUCTOS
   // =============================
-
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
@@ -236,7 +289,6 @@ export default function BarcodeBusinessSystem() {
   // =============================
   // Render principal
   // =============================
-
   return (
     <div
       className={`min-h-screen p-6 transition-all duration-500 ${
@@ -248,12 +300,11 @@ export default function BarcodeBusinessSystem() {
       {/* ============================= */}
       {/* HEADER */}
       {/* ============================= */}
-
       <div className="mb-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-6">
           <div>
             <h1 className="text-5xl font-black mb-3 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent tracking-tight">
-              Sistema de Código de Barras v1.0
+              Sistema de Código de Barras v1.1
             </h1>
             <p className={`${darkMode ? "text-gray-300" : "text-slate-600"} text-lg`}>
               Genera, escanea y administra productos fácilmente.
@@ -261,6 +312,23 @@ export default function BarcodeBusinessSystem() {
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Botón de Login dinámico */}
+            {isAdmin ? (
+              <button
+                onClick={handleLogout}
+                className="px-5 h-12 rounded-2xl font-semibold shadow-lg bg-red-500 text-white hover:bg-red-600 transition duration-300"
+              >
+                🔒 Cerrar Sesión
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowLoginModal(true)}
+                className="px-5 h-12 rounded-2xl font-semibold shadow-lg bg-indigo-600 text-white hover:bg-indigo-700 transition duration-300"
+              >
+                🔓 Entrar como Admin
+              </button>
+            )}
+
             <button
               onClick={() => setDarkMode(!darkMode)}
               className={`px-5 h-12 rounded-2xl font-semibold shadow-lg transition-all duration-300 ${
@@ -313,7 +381,12 @@ export default function BarcodeBusinessSystem() {
 
           <button
             onClick={exportToExcel}
-            className="h-14 px-8 rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 text-black font-bold shadow-lg shadow-green-500/30 hover:scale-105 transition-all duration-300"
+            disabled={!isAdmin}
+            className={`h-14 px-8 rounded-2xl font-bold shadow-lg transition-all duration-300 ${
+              isAdmin
+                ? "bg-gradient-to-r from-emerald-400 to-green-500 text-black hover:scale-105 shadow-green-500/30"
+                : "bg-gray-600 text-gray-400 cursor-not-allowed opacity-50"
+            }`}
           >
             Exportar Excel
           </button>
@@ -321,16 +394,28 @@ export default function BarcodeBusinessSystem() {
       </div>
 
       {/* ============================= */}
-      {/* FORMULARIO */}
+      {/* FORMULARIO (Bloqueado visualmente si no es admin) */}
       {/* ============================= */}
+      <div className={`bg-white/10 backdrop-blur-xl rounded-[32px] shadow-2xl p-8 mb-8 border border-white/10 relative overflow-hidden transition-all duration-300 ${!isAdmin && "opacity-60"}`}>
+        {!isAdmin && (
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-xs flex flex-col items-center justify-center z-10 p-4 text-center">
+            <p className="text-white font-bold text-lg mb-2">Panel de modificaciones reservado para Administradores</p>
+            <button 
+              onClick={() => setShowLoginModal(true)}
+              className="text-xs bg-cyan-500 text-black px-4 py-2 rounded-xl font-bold hover:bg-cyan-400 transition shadow-md"
+            >
+              Iniciar Sesión
+            </button>
+          </div>
+        )}
 
-      <div className="bg-white/10 backdrop-blur-xl rounded-[32px] shadow-2xl p-8 mb-8 border border-white/10">
         <h2 className="text-3xl font-bold mb-6 text-white">Agregar Producto</h2>
 
         <div className="flex flex-col md:flex-row gap-4">
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
+            disabled={!isAdmin}
             className="h-14 rounded-2xl border border-white/10 bg-white/10 text-white px-5 outline-none focus:ring-2 focus:ring-cyan-400 backdrop-blur-md"
           >
             <option value="General" className="text-black">General</option>
@@ -346,6 +431,7 @@ export default function BarcodeBusinessSystem() {
             placeholder="Nombre del producto"
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
+            disabled={!isAdmin}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 generateBarcode();
@@ -356,6 +442,7 @@ export default function BarcodeBusinessSystem() {
 
           <button
             onClick={generateBarcode}
+            disabled={!isAdmin}
             className="h-14 px-8 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold shadow-lg shadow-cyan-500/30 transition-all duration-300 hover:scale-105"
           >
             Generar Código
@@ -394,13 +481,12 @@ export default function BarcodeBusinessSystem() {
       {/* ============================= */}
       {/* LISTA DE PRODUCTOS */}
       {/* ============================= */}
-
       {products.length === 0 ? (
         <div
           className={
             darkMode
-              ? "backdrop-blur-xl rounded-[32px] shadow-xl p-6 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 bg-white/5 border border-white/10 text-white"
-              : "backdrop-blur-xl rounded-[32px] shadow-xl p-6 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 bg-white/90 border border-white/50 text-black"
+              ? "backdrop-blur-xl rounded-[32px] shadow-xl p-6 bg-white/5 border border-white/10 text-white"
+              : "backdrop-blur-xl rounded-[32px] shadow-xl p-6 bg-white/90 border border-white/50 text-black"
           }
         >
           No hay productos registrados todavía.
@@ -412,6 +498,7 @@ export default function BarcodeBusinessSystem() {
               key={product.firebaseId}
               product={product}
               darkMode={darkMode}
+              isAdmin={isAdmin} // Enviamos privilegios a las tarjetas
               onDelete={deleteProduct}
               onEdit={() => {
                 setEditingProduct(product);
@@ -423,9 +510,57 @@ export default function BarcodeBusinessSystem() {
       )}
 
       {/* ============================= */}
+      {/* MODAL DE LOGIN (ADMIN) */}
+      {/* ============================= */}
+      {showLoginModal && (
+        <Modal onClose={() => setShowLoginModal(false)}>
+          <h2 className="text-3xl font-bold mb-3 text-white">Ingreso Admin</h2>
+          <p className="text-sm text-gray-400 mb-6">Ingresa tus credenciales para habilitar los permisos de edición.</p>
+          
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-400 uppercase mb-2">Correo Electrónico</label>
+              <input
+                type="email"
+                required
+                value={authEmail}
+                onChange={(e) => setAuthEmail(e.target.value)}
+                className="w-full h-12 rounded-2xl bg-white/5 border border-white/10 px-4 text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="correo@ejemplo.com"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-400 uppercase mb-2">Contraseña</label>
+              <input
+                type="password"
+                required
+                value={authPassword}
+                onChange={(e) => setAuthPassword(e.target.value)}
+                className="w-full h-12 rounded-2xl bg-white/5 border border-white/10 px-4 text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="••••••••"
+              />
+            </div>
+
+            {authError && (
+              <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 p-3 rounded-xl">
+                {authError}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              className="w-full h-12 mt-2 rounded-2xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 transition shadow-lg shadow-indigo-600/30"
+            >
+              Iniciar Sesión
+            </button>
+          </form>
+        </Modal>
+      )}
+
+      {/* ============================= */}
       {/* MODAL ESCANER */}
       {/* ============================= */}
-
       {scannerOpen && (
         <Modal onClose={() => setScannerOpen(false)}>
           <h2 className="text-3xl font-bold mb-6 text-white">Escanear Código</h2>
@@ -460,7 +595,6 @@ export default function BarcodeBusinessSystem() {
       {/* ============================= */}
       {/* MODAL EDITAR */}
       {/* ============================= */}
-
       {editingProduct && (
         <Modal onClose={() => setEditingProduct(null)}>
           <h2 className="text-3xl font-bold mb-6 text-white">Cambiar Nombre</h2>
@@ -489,18 +623,14 @@ export default function BarcodeBusinessSystem() {
  TARJETA DEL PRODUCTO
 ====================================================
 */
-
 function ProductCard({
   product,
   onDelete,
   onEdit,
   darkMode,
+  isAdmin,
 }) {
   const svgRef = useRef(null);
-
-  // =============================
-  // Generar visual del código
-  // =============================
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -516,27 +646,18 @@ function ProductCard({
     });
   }, [product.barcode]);
 
-  // =============================
-  // Descargar código SVG
-  // =============================
-
   const downloadBarcode = () => {
     const svg = svgRef.current;
-
-    if (!svg || typeof window === "undefined") {
-      return;
-    }
+    if (!svg || typeof window === "undefined") return;
 
     try {
       const serializer = new XMLSerializer();
       const source = serializer.serializeToString(svg);
-
       const blob = new Blob([source], {
         type: "image/svg+xml;charset=utf-8",
       });
 
       const url = window.URL.createObjectURL(blob);
-
       const link = document.createElement("a");
       link.href = url;
       link.download = `${product.name}.svg`;
@@ -544,20 +665,14 @@ function ProductCard({
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error downloading barcode:", error);
     }
   };
 
-  // =============================
-  // Diseño moderno de tarjeta
-  // =============================
-
   return (
     <div className="bg-white/10 backdrop-blur-xl rounded-[32px] shadow-2xl border border-white/10 overflow-hidden hover:scale-[1.02] hover:shadow-cyan-500/20 transition-all duration-300">
-      {/* Header */}
       <div className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white p-5">
         <div className="flex justify-between items-start gap-3">
           <div className="min-w-0">
@@ -572,25 +687,26 @@ function ProductCard({
             </p>
           </div>
 
-          {/* Botones */}
-          <div className="flex gap-2 shrink-0">
-            <button
-              onClick={onEdit}
-              className="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-sm font-semibold backdrop-blur-md transition"
-            >
-              Editar
-            </button>
-            <button
-              onClick={() => onDelete(product.firebaseId)}
-              className="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition"
-            >
-              Eliminar
-            </button>
-          </div>
+          {/* Botones de acción editables condicionales */}
+          {isAdmin && (
+            <div className="flex gap-2 shrink-0">
+              <button
+                onClick={onEdit}
+                className="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-sm font-semibold backdrop-blur-md transition"
+              >
+                Editar
+              </button>
+              <button
+                onClick={() => onDelete(product.firebaseId)}
+                className="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition"
+              >
+                Eliminar
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Código de barras */}
       <div className="p-6">
         <div
           className={`rounded-3xl p-6 w-full max-w-md relative shadow-2xl transition-all duration-300 ${
@@ -600,7 +716,6 @@ function ProductCard({
           <svg ref={svgRef} className="w-full"></svg>
         </div>
 
-        {/* Acciones */}
         <div className="mt-5 flex flex-col gap-3">
           <button
             onClick={downloadBarcode}
@@ -625,24 +740,18 @@ function ProductCard({
  ESCANER
 ====================================================
 */
-
 function BarcodeScanner({ onScan }) {
   useEffect(() => {
     let scannerInstance;
 
     scannerInstance = new Html5QrcodeScanner(
       "scanner",
-      {
-        fps: 10,
-        qrbox: 250,
-      },
+      { fps: 10, qrbox: 250 },
       false
     );
 
     scannerInstance.render(
-      (decodedText) => {
-        onScan(decodedText);
-      },
+      (decodedText) => { onScan(decodedText); },
       () => {}
     );
 
@@ -668,7 +777,6 @@ function BarcodeScanner({ onScan }) {
  MODAL
 ====================================================
 */
-
 function Modal({ children, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -679,7 +787,6 @@ function Modal({ children, onClose }) {
         >
           ×
         </button>
-
         {children}
       </div>
     </div>
